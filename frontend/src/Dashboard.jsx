@@ -363,6 +363,8 @@ export default function Dashboard() {
         isAdmin={isAdmin}
         darkMode={darkMode}
         logoSrc={diskominfoLogoFull}
+        profilUsername={profilUsername}
+        handleLogout={handleLogout}
       />
 
       <main className="flex-1 p-8 overflow-y-auto min-w-0">
