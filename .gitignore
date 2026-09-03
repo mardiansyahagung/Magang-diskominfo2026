@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment variables (JANGAN pernah di-upload, isi kredensial rahasia)
+.env
+.env.local
+
+# File upload user (surat, evidence, dll)
+backend-aset/uploads/
+
+# Build output
+dist/
+build/
+
+# Log & cache
+*.log
+.DS_Store
+.vite/
