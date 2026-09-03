@@ -40,8 +40,8 @@ export default function TabelAset({
               <th className="p-2 border-b border-inherit">Anomali</th>
               <th className="p-2 border-b border-inherit">Insiden</th>
               <th className="p-2 border-b border-inherit">Evidence</th>
-              <th className="p-2 border-b border-inherit">Penanganan</th>
-              <th className="p-2 border-b border-inherit">Diinput oleh</th>
+              <th className="p-2 border-b border-inherit text-center">Penanganan</th>
+              <th className="p-2 border-b border-inherit text-center">Diinput oleh</th>
               {isAdmin && <th className="p-2 border-b border-inherit text-center">Aksi</th>}
             </tr>
           </thead>

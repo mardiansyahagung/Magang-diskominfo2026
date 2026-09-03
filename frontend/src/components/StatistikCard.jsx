@@ -66,7 +66,7 @@ export default function StatistikCard({
         }}
         className={`bg-slate-700 text-white p-6 rounded-xl shadow-lg border border-slate-800 cursor-pointer transform transition hover:scale-105 ${filterKategori === "mati" ? "ring-4 ring-slate-400" : ""}`}
       >
-        <h2 className="text-lg font-semibold opacity-80">Aset Bermasalah</h2>
+        <h2 className="text-lg font-semibold opacity-80">Aset Down</h2>
         <p className="text-5xl font-bold mt-2">{webMati}</p>
       </div>
 
