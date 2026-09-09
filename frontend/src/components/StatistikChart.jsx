@@ -163,7 +163,7 @@ export default function StatistikChart({ semuaDataAset, darkMode }) {
           className={`p-6 rounded-xl shadow-lg border transition-colors ${cardBg}`}
         >
           <h3 className={`text-lg font-bold mb-4 border-b pb-2 ${titleColor}`}>
-            🚨 Distribusi Jenis Anomali
+            🚨 Distribusi Jenis anomali
           </h3>
           {dataAnomali.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-sm text-slate-500">

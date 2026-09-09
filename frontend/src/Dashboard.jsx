@@ -19,7 +19,11 @@ import ModalPulihkan from "./components/dashboard/ModalPulihkan";
 import ModalPreviewPDF from "./components/dashboard/ModalPreviewPDF";
 import ModalPreviewBukti from "./components/dashboard/ModalPreviewBukti";
 
-import { API_BASE_URL, INITIAL_FORM_DATA, isAnomali } from "./utils/dashboardHelpers";
+import {
+  API_BASE_URL,
+  INITIAL_FORM_DATA,
+  isAnomali,
+} from "./utils/dashboardHelpers";
 import { exportAsetExcel } from "./utils/exportExcel";
 import { buildAsetPdf, buildInsidenPdf } from "./utils/exportPdf";
 
@@ -28,7 +32,9 @@ export default function Dashboard() {
 
   // --- State Sidebar Navigation & Toggle ---
   const [activeMenu, setActiveMenu] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true,
+  );
 
   // --- State Data Utama & Filter ---
   const [semuaDataAset, setSemuaDataAset] = useState([]);
@@ -64,13 +70,19 @@ export default function Dashboard() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   const [modalPulihkanBuka, setModalPulihkanBuka] = useState(false);
-  const [dataPulihkanTarget, setDataPulihkanTarget] = useState({ id: null, nama_domain: "" });
+  const [dataPulihkanTarget, setDataPulihkanTarget] = useState({
+    id: null,
+    nama_domain: "",
+  });
 
   const [modalEditBuka, setModalEditBuka] = useState(false);
   const [editData, setEditData] = useState({ id: "", ...INITIAL_FORM_DATA });
 
   const [modalHapusBuka, setModalHapusBuka] = useState(false);
-  const [dataHapusTarget, setDataHapusTarget] = useState({ id: null, nama_domain: "" });
+  const [dataHapusTarget, setDataHapusTarget] = useState({
+    id: null,
+    nama_domain: "",
+  });
 
   const isAdmin = profilRole === "admin";
 
@@ -91,7 +103,9 @@ export default function Dashboard() {
   const muatDataDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/aset`, { credentials: "include" });
+      const response = await fetch(`${API_BASE_URL}/aset`, {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error(`Server status: ${response.status}`);
 
       const data = await response.json();
@@ -99,7 +113,10 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Gagal menarik data:", error);
       setSemuaDataAset([]);
-      setToast({ message: "Gagal memuat data dari server (Error 500/Koneksi).", type: "error" });
+      setToast({
+        message: "Gagal memuat data dari server (Error 500/Koneksi).",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -141,7 +158,10 @@ export default function Dashboard() {
         setModalTambahBuka(false);
         setFormData(INITIAL_FORM_DATA);
         muatDataDashboard();
-        setToast({ message: "Aset web berhasil ditambahkan!", type: "success" });
+        setToast({
+          message: "Aset web berhasil ditambahkan!",
+          type: "success",
+        });
       } else {
         setToast({ message: "Gagal menyimpan data aset.", type: "error" });
       }
@@ -193,15 +213,21 @@ export default function Dashboard() {
 
   const handleKonfirmasiPulihkan = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/aset/pulihkan/${dataPulihkanTarget.id}`, {
-        method: "PUT",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/aset/pulihkan/${dataPulihkanTarget.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+        },
+      );
 
       if (res.ok) {
         setModalPulihkanBuka(false);
         muatDataDashboard();
-        setToast({ message: `Aset "${dataPulihkanTarget.nama_domain}" berhasil dipulihkan menjadi Aman!`, type: "success" });
+        setToast({
+          message: `Aset "${dataPulihkanTarget.nama_domain}" berhasil dipulihkan menjadi Aman!`,
+          type: "success",
+        });
       } else {
         setToast({ message: "Gagal memulihkan aset.", type: "error" });
       }
@@ -225,7 +251,10 @@ export default function Dashboard() {
       if (res.ok) {
         setModalHapusBuka(false);
         muatDataDashboard();
-        setToast({ message: `Aset "${dataHapusTarget.nama_domain}" berhasil dihapus permanen!`, type: "success" });
+        setToast({
+          message: `Aset "${dataHapusTarget.nama_domain}" berhasil dihapus permanen!`,
+          type: "success",
+        });
       } else {
         setToast({ message: "Gagal menghapus data.", type: "error" });
       }
@@ -251,7 +280,9 @@ export default function Dashboard() {
 
         let lolosKategori = true;
         const filterKatClean = (filterKategori || "semua").toLowerCase().trim();
-        const barisAnomaliClean = (baris.jenis_anomali || "aman").toLowerCase().trim();
+        const barisAnomaliClean = (baris.jenis_anomali || "aman")
+          .toLowerCase()
+          .trim();
 
         if (filterKatClean === "semua") {
           lolosKategori = true;
@@ -267,63 +298,97 @@ export default function Dashboard() {
 
         let lolosPenanganan = true;
         if (filterPenanganan !== "semua") {
-          lolosPenanganan = (baris.status_perbaikan || "Belum Ditangani") === filterPenanganan;
+          lolosPenanganan =
+            (baris.status_perbaikan || "Belum Ditangani") === filterPenanganan;
         }
 
         const kataKunciClean = (kataKunci || "").toLowerCase().trim();
         const namaDomain = (baris.nama_domain || "").toLowerCase();
         const tglInsiden = (baris.tanggal_insiden || "").toLowerCase();
-        const lolosCari = namaDomain.includes(kataKunciClean) || tglInsiden.includes(kataKunciClean);
+        const lolosCari =
+          namaDomain.includes(kataKunciClean) ||
+          tglInsiden.includes(kataKunciClean);
 
         return lolosKategori && lolosPenanganan && lolosCari;
       })
       .sort((a, b) => {
         // Urutkan berdasarkan tanggal insiden terbaru di paling atas.
         // Baris tanpa tanggal insiden diletakkan paling bawah.
-        const tglA = a?.tanggal_insiden ? new Date(a.tanggal_insiden).getTime() : -Infinity;
-        const tglB = b?.tanggal_insiden ? new Date(b.tanggal_insiden).getTime() : -Infinity;
+        const tglA = a?.tanggal_insiden
+          ? new Date(a.tanggal_insiden).getTime()
+          : -Infinity;
+        const tglB = b?.tanggal_insiden
+          ? new Date(b.tanggal_insiden).getTime()
+          : -Infinity;
         return tglB - tglA;
       });
   }, [semuaDataAset, filterKategori, filterPenanganan, kataKunci]);
 
   // --- Filtering Data (Riwayat Insiden) ---
   const dataInsiden = useMemo(() => {
-    return (Array.isArray(semuaDataAset) ? semuaDataAset : [])
-      // Tampilkan SEMUA data web, bukan hanya yang beranomali,
-      // supaya seluruh daftar aset tetap terlihat di halaman ini.
-      .filter((d) => {
-        if (!tglMulai && !tglAkhir) return true;
-        if (!d?.tanggal_insiden) return false;
-        const tgl = d.tanggal_insiden; // format "YYYY-MM-DD" dari backend
-        if (tglMulai && tgl < tglMulai) return false;
-        if (tglAkhir && tgl > tglAkhir) return false;
-        return true;
-      })
-      .sort((a, b) => {
-        const tglA = a?.tanggal_insiden ? new Date(a.tanggal_insiden).getTime() : -Infinity;
-        const tglB = b?.tanggal_insiden ? new Date(b.tanggal_insiden).getTime() : -Infinity;
-        return tglB - tglA;
-      });
+    return (
+      (Array.isArray(semuaDataAset) ? semuaDataAset : [])
+        // Tampilkan SEMUA data web, bukan hanya yang beranomali,
+        // supaya seluruh daftar aset tetap terlihat di halaman ini.
+        .filter((d) => {
+          if (!tglMulai && !tglAkhir) return true;
+          if (!d?.tanggal_insiden) return false;
+          const tgl = d.tanggal_insiden; // format "YYYY-MM-DD" dari backend
+          if (tglMulai && tgl < tglMulai) return false;
+          if (tglAkhir && tgl > tglAkhir) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          const tglA = a?.tanggal_insiden
+            ? new Date(a.tanggal_insiden).getTime()
+            : -Infinity;
+          const tglB = b?.tanggal_insiden
+            ? new Date(b.tanggal_insiden).getTime()
+            : -Infinity;
+          return tglB - tglA;
+        })
+    );
   }, [semuaDataAset, tglMulai, tglAkhir]);
 
   // --- Pagination Logic (Dashboard) ---
   const totalPages = Math.max(1, Math.ceil(dataTersaring.length / rowsPerPage));
   const pageAman = Math.min(currentPage, totalPages);
-  const dataHalaman = dataTersaring.slice((pageAman - 1) * rowsPerPage, pageAman * rowsPerPage);
+  const dataHalaman = dataTersaring.slice(
+    (pageAman - 1) * rowsPerPage,
+    pageAman * rowsPerPage,
+  );
 
   // --- Pagination Logic (Riwayat Insiden) ---
-  const totalPagesInsiden = Math.max(1, Math.ceil(dataInsiden.length / rowsPerPage));
+  const totalPagesInsiden = Math.max(
+    1,
+    Math.ceil(dataInsiden.length / rowsPerPage),
+  );
   const pageAmanInsiden = Math.min(currentPageInsiden, totalPagesInsiden);
-  const dataHalamanInsiden = dataInsiden.slice((pageAmanInsiden - 1) * rowsPerPage, pageAmanInsiden * rowsPerPage);
+  const dataHalamanInsiden = dataInsiden.slice(
+    (pageAmanInsiden - 1) * rowsPerPage,
+    pageAmanInsiden * rowsPerPage,
+  );
 
   // --- Export Handlers ---
   const handleExportExcel = async () => {
-    const result = await exportAsetExcel(dataTersaring, filterKategori, filterPenanganan);
-    setToast({ message: result.message, type: result.success ? "success" : "error" });
+    const result = await exportAsetExcel(
+      dataTersaring,
+      filterKategori,
+      filterPenanganan,
+    );
+    setToast({
+      message: result.message,
+      type: result.success ? "success" : "error",
+    });
   };
 
   const handleExportPDF = async () => {
-    const result = await buildAsetPdf(dataTersaring, filterKategori, filterPenanganan, profilUsername);
+    const result = await buildAsetPdf(
+      dataTersaring,
+      filterKategori,
+      filterPenanganan,
+      profilUsername,
+    );
     if (result.error) {
       setToast({ message: result.error, type: "error" });
       return;
@@ -332,7 +397,12 @@ export default function Dashboard() {
   };
 
   const handleExportPDFInsiden = async () => {
-    const result = await buildInsidenPdf(dataInsiden, tglMulai, tglAkhir, profilUsername);
+    const result = await buildInsidenPdf(
+      dataInsiden,
+      tglMulai,
+      tglAkhir,
+      profilUsername,
+    );
     if (result.error) {
       setToast({ message: result.error, type: "error" });
       return;
@@ -353,13 +423,20 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={`h-screen flex font-sans transition-colors duration-300 overflow-hidden ${darkMode ? "bg-slate-950 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
-      <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: "", type: "success" })} />
+    <div
+      className={`h-screen flex font-sans transition-colors duration-300 overflow-hidden ${darkMode ? "bg-slate-950 text-slate-100" : "bg-slate-100 text-slate-800"}`}
+    >
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: "", type: "success" })}
+      />
 
       <Sidebar
         activeMenu={activeMenu}
         setActiveMenu={setActiveMenu}
         sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
         isAdmin={isAdmin}
         darkMode={darkMode}
         logoSrc={diskominfoLogoFull}
@@ -427,11 +504,17 @@ export default function Dashboard() {
         )}
 
         {activeMenu === "persuratan" && (
-  <Persuratan darkMode={darkMode} isAdmin={isAdmin} setToast={setToast} />
-)}
+          <Persuratan
+            darkMode={darkMode}
+            isAdmin={isAdmin}
+            setToast={setToast}
+          />
+        )}
 
         {activeMenu === "tools" && (
-          <div className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
+          <div
+            className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}
+          >
             <ToolsDorking
               darkMode={darkMode}
               daftarAset={semuaDataAset}
@@ -443,13 +526,21 @@ export default function Dashboard() {
         )}
 
         {activeMenu === "users" && (
-          <div className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
-            <ManajemenUser darkMode={darkMode} profilUsername={profilUsername} setToast={setToast} />
+          <div
+            className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}
+          >
+            <ManajemenUser
+              darkMode={darkMode}
+              profilUsername={profilUsername}
+              setToast={setToast}
+            />
           </div>
         )}
 
         {activeMenu === "logs" && (
-          <div className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
+          <div
+            className={`p-6 rounded-xl shadow-lg border transition-colors ${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}
+          >
             <LogAktivitas darkMode={darkMode} setToast={setToast} />
           </div>
         )}
@@ -499,7 +590,11 @@ export default function Dashboard() {
         darkMode={darkMode}
       />
 
-      <ModalPreviewBukti url={previewBukti} onClose={() => setPreviewBukti(null)} darkMode={darkMode} />
+      <ModalPreviewBukti
+        url={previewBukti}
+        onClose={() => setPreviewBukti(null)}
+        darkMode={darkMode}
+      />
     </div>
   );
 }
